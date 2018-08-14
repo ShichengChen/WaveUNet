@@ -1,2 +1,2 @@
 # WaveUNet
-implement Wave-U-Net from pytorch
+implement Wave-U-Net by pytorch
