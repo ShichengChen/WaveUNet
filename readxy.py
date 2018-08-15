@@ -7,15 +7,14 @@ from torch.utils import data
 import torch.nn.functional as F
 from transformData import mu_law_encode
 
-sampleSize = 16000
-sample_rate = 16000  # the length of audio for one second
+sampleSize = 16384 * 5
+sample_rate = 16384 * 5  # the length of audio for one second
 
 
 class Dataset(data.Dataset):
-    def __init__(self, listx, rootx,pad, transform=None):
+    def __init__(self, listx, rootx, transform=None):
         self.rootx = rootx
         self.listx = listx
-        self.pad=int(pad)
         #self.device=device
         self.transform = transform
 
@@ -30,26 +29,29 @@ class Dataset(data.Dataset):
 
         h5f = h5py.File(self.rootx + str(namex) + '.h5', 'r')
         x, y, z = h5f['x'][:], h5f['y'][:],h5f['z'][:]
+        h5f.close()
 
-        #factor0 = np.random.uniform(low=0.83, high=1.0)
-        #factor1 = np.random.uniform(low=0.83, high=1.0)
-        #factor0 = np.random.uniform(low=0.9, high=1.0)
-        #factor1 = np.random.uniform(low=0.9, high=1.0)
+        factor0 = np.random.uniform(low=0.83, high=1.0)
+        factor1 = np.random.uniform(low=0.83, high=1.0)
         #print(factor0,factor1)
-        #z = z*factor0
-        #y = y*factor1
-        #x = (y + z)
+        z = z*factor0
+        y = y*factor1
+        x = (y + z)
 
-        x = mu_law_encode(x)  # use mu_law to encode the audio
-        y = mu_law_encode(y)
 
-        #xmean = -0.0039727693202439695
-        #xstd = 0.54840165197849278
-        #x = (x - xmean) / xstd
-        x = torch.from_numpy(x.reshape(-1)).type(torch.LongTensor)
-        y = torch.from_numpy(y.reshape(-1)).type(torch.LongTensor)
-        #x = F.pad(x, (self.pad, self.pad), mode='constant', value=127)
-        #y = F.pad(y, (self.pad, self.pad), mode='constant', value=127)
+        xmean = x.mean()
+        xstd = x.std()
+        x = (x - xmean) / xstd
+        y = (y - xmean) / xstd
+
+        start = np.random.randint(0, x.shape[0] - sampleSize - 1, size=1)[0]
+        #print(start)
+        x = x[start:start + sampleSize]
+        y = y[start:start + sampleSize]
+
+        x = torch.from_numpy(x.reshape(1,-1)).type(torch.float32)
+        y = torch.from_numpy(y.reshape(1,-1)).type(torch.float32)
+
 
         sample = {'x': x, 'y': y}
 
@@ -91,10 +93,9 @@ class ToTensor(object):
 
 
 class Testset(data.Dataset):
-    def __init__(self, listx, rootx,pad):
+    def __init__(self, listx, rootx):
         self.rootx = rootx
         self.listx = listx
-        self.pad = int(pad)
         #self.device=device
 
     def __len__(self):
@@ -108,22 +109,13 @@ class Testset(data.Dataset):
         h5f = h5py.File('ccmixter3/' + str(namex) + '.h5', 'r')
         x, y = h5f['x'][:], h5f['y'][:]
 
-        x = mu_law_encode(x)  # use mu_law to encode the audio
-        y = mu_law_encode(y)
+        xmean = x.mean()
+        xstd = x.std()
+        x = (x - xmean) / xstd
+        y = (y - xmean) / xstd
 
-        #xmean = -0.0039727693202439695
-        #xstd = 0.54840165197849278
-        #x = (x - xmean) / xstd
-        #x = np.pad(x, (self.pad, self.pad), 'constant')
-        #y = np.pad(y, (self.pad, self.pad), 'constant')
-
-        #x = torch.from_numpy(x.reshape(1, -1)).type(torch.float32)
-        #y = torch.from_numpy(y.reshape(-1)).type(torch.LongTensor)
-        x = torch.from_numpy(x.reshape(-1)).type(torch.LongTensor)
-        y = torch.from_numpy(y.reshape(-1)).type(torch.LongTensor)
-        #x = F.pad(x, (self.pad, self.pad), mode='constant', value=127)
-        #y = F.pad(y, (self.pad, self.pad), mode='constant', value=127)
-
+        x = torch.from_numpy(x.reshape(1,-1)).type(torch.float32)
+        y = torch.from_numpy(y.reshape(1,-1)).type(torch.float32)
 
 
         return namex,x,y

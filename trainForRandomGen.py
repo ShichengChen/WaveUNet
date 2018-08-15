@@ -18,7 +18,7 @@ from tensorboardX import SummaryWriter
 writer = SummaryWriter()
 # In[2]:
 
-batchSize = 10
+batchSize = 20
 sampleSize = 16384*batchSize  # the length of the sample size
 sample_rate = 16384
 songnum=45
@@ -50,8 +50,8 @@ device = torch.device("cuda" if use_cuda else "cpu")
 #validation_set = Testset(np.arange(45,50), 'ccmixter3/',pad=pad)
 training_set = Dataset(np.arange(10), 'ccmixter3/',transform=None)
 validation_set = Testset(np.arange(10), 'ccmixter3/')
-loadtr = data.DataLoader(training_set, batch_size=1,shuffle=True,num_workers=2,worker_init_fn=np.random.seed)
-loadval = data.DataLoader(validation_set,batch_size=1,num_workers=2)
+loadtr = data.DataLoader(training_set, batch_size=10,shuffle=True,num_workers=4,worker_init_fn=np.random.seed)
+loadval = data.DataLoader(validation_set,batch_size=1,num_workers=4)
 # In[6]:
 
 #model = Unet(skipDim, quantization_channels, residualDim,device)
@@ -110,7 +110,7 @@ def test(epoch):  # testing data
 
 def train(epoch):  # training data, the audio except for last 15 seconds
     for iloader,xtrain, ytrain in loadtr:
-        iloader=int(iloader)
+        #iloader=int(iloader)
         startx = np.random.randint(0,sampleSize)
         #startx = 0
         idx = np.arange(startx, xtrain.shape[-1] - sampleSize, sampleSize)
@@ -119,25 +119,27 @@ def train(epoch):  # training data, the audio except for last 15 seconds
         #idx = idx[:lens]
         cnt, aveloss = 0, 0
         start_time = time.time()
-        for i, ind in enumerate(idx):
-            model.train()
-            data = xtrain[:, :, ind:ind + sampleSize].to(device)
-            target = ytrain[:, :,ind:ind + sampleSize].to(device)
-            data = data.view(batchSize,1,-1)
-            target = target.view(batchSize, 1, -1)
-            output = model(data)
-            loss = criterion(output, target)
-            aveloss+=float(loss)
-            cnt+=1
-            lossrecord.append(float(loss))
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            global sampleCnt
-            sampleCnt+=1
-            if sampleCnt % 10000 == 0 and sampleCnt > 0:
-                for param in optimizer.param_groups:
-                    param['lr'] *= 0.98
+        #for i, ind in enumerate(idx):
+        model.train()
+            #data = xtrain[:, :, ind:ind + sampleSize].to(device)
+            #target = ytrain[:, :,ind:ind + sampleSize].to(device)
+            #data = data.view(batchSize,1,-1)
+            #target = target.view(batchSize, 1, -1)
+        data = xtrain.to(device)
+        target = ytrain.to(device)
+        output = model(data)
+        loss = criterion(output, target)
+        aveloss+=float(loss)
+        cnt+=1
+        lossrecord.append(float(loss))
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        global sampleCnt
+        sampleCnt+=1
+        if sampleCnt % 10000 == 0 and sampleCnt > 0:
+            for param in optimizer.param_groups:
+                param['lr'] *= 0.98
         global iteration
         iteration += 1
         print('loss for train:{:.3f},num{},epoch{},({:.3f} sec/step)'.format(
@@ -159,4 +161,4 @@ print('training...')
 for epoch in range(100000):
     train(epoch+start_epoch)
     #test(epoch + start_epoch)
-    if (epoch+start_epoch) % 6 == 0 and epoch+start_epoch > 0: test(epoch+start_epoch)
+    if (epoch+start_epoch) % 100 == 0 and epoch+start_epoch > 0: test(epoch+start_epoch)
