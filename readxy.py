@@ -7,8 +7,8 @@ from torch.utils import data
 import torch.nn.functional as F
 from transformData import mu_law_encode
 
-sampleSize = 16384 * 5
-sample_rate = 16384 * 5  # the length of audio for one second
+sampleSize = 16384 * 60
+sample_rate = 16384 * 60  # the length of audio for one second
 
 
 class Dataset(data.Dataset):
