@@ -15,10 +15,9 @@ from readxy import Dataset, Testset, RandomCrop, ToTensor
 from unet import Unet
 from tensorboardX import SummaryWriter
 
-writer = SummaryWriter()
 # In[2]:
 
-batchSize = 7
+batchSize = 10
 sampleSize = 16384*batchSize  # the length of the sample size
 sample_rate = 16384
 songnum=45
@@ -27,9 +26,10 @@ savemusic='vsCorpus/nus1xtr{}.wav'
 #savemusic1='vsCorpus/nus11xtr{}.wav'
 resumefile = 'model/instrument1'  # name of checkpoint
 continueTrain = False  # whether use checkpoint
-lossrecord = []  # list for record loss
 sampleCnt=0
+USEBOARD = True
 
+if(USEBOARD):writer = SummaryWriter()
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # use specific GPU
@@ -37,7 +37,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # use specific GPU
 # In[4]:
 from datetime import datetime
 current_time = datetime.now().strftime('%b%d_%H-%M-%S')
-writer = SummaryWriter(log_dir='../conditioned-wavenet/runs/'+str(current_time),comment="uwavenet")
+if(USEBOARD):writer = SummaryWriter(log_dir='../conditioned-wavenet/runs/'+str(current_time),comment="uwavenet")
 
 use_cuda = torch.cuda.is_available()  # whether have available GPU
 torch.manual_seed(1)
@@ -50,7 +50,9 @@ device = torch.device("cuda" if use_cuda else "cpu")
 #validation_set = Testset(np.arange(45,50), 'ccmixter3/',pad=pad)
 training_set = Dataset(np.arange(45), 'ccmixter3/',transform=None)
 validation_set = Testset(np.arange(50), 'ccmixter3/')
-loadtr = data.DataLoader(training_set, batch_size=10,shuffle=True,num_workers=10,worker_init_fn=np.random.seed)
+
+worker_init_fn = lambda worker_id: np.random.seed(np.random.get_state()[1][0] + worker_id)
+loadtr = data.DataLoader(training_set, batch_size=10,shuffle=True,num_workers=10,worker_init_fn=worker_init_fn)
 loadval = data.DataLoader(validation_set,batch_size=1,num_workers=10)
 # In[6]:
 
@@ -73,7 +75,6 @@ if continueTrain:  # if continueTrain, the program will find the checkpoints
         checkpoint = torch.load(resumefile)
         start_epoch = checkpoint['epoch']
         iteration = checkpoint['iteration']
-        # best_prec1 = checkpoint['best_prec1']
         model.load_state_dict(checkpoint['state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         print("=> loaded checkpoint '{}' (epoch {})"
@@ -110,7 +111,6 @@ def test(epoch):  # testing data
 
 def train(epoch):  # training data, the audio except for last 15 seconds
     for iloader,xtrain, ytrain in loadtr:
-        #iloader=int(iloader)
         startx = 0
         idx = np.arange(startx, xtrain.shape[-1] - sampleSize, sampleSize//batchSize)
         np.random.shuffle(idx)
@@ -126,12 +126,11 @@ def train(epoch):  # training data, the audio except for last 15 seconds
             loss = criterion(output, target)
             aveloss+=float(loss)
             cnt+=1
-            lossrecord.append(float(loss))
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             global sampleCnt
-            sampleCnt+=1
+            sampleCnt+=100
             if sampleCnt % 10000 == 0 and sampleCnt > 0:
                 for param in optimizer.param_groups:
                     param['lr'] *= 0.98
@@ -139,8 +138,8 @@ def train(epoch):  # training data, the audio except for last 15 seconds
         iteration += 1
         print('loss for train:{:.3f},epoch{},({:.3f} sec/step)'.format(
             aveloss / cnt, epoch,time.time() - start_time))
-        writer.add_scalar('waveunet loss', (aveloss / cnt), iteration)
-    if epoch % 10 == 0:
+        if (USEBOARD):writer.add_scalar('waveunet loss', (aveloss / cnt), iteration)
+    if epoch % 5 == 0:
         if not os.path.exists('model/'): os.makedirs('model/')
         state = {'epoch': epoch,
                  'state_dict': model.state_dict(),
@@ -156,4 +155,4 @@ print('training...')
 for epoch in range(100000):
     train(epoch+start_epoch)
     #test(epoch + start_epoch)
-    if (epoch+start_epoch) % 30 == 0 and epoch+start_epoch > 0: test(epoch+start_epoch)
+    if (epoch+start_epoch) % 25 == 0 and epoch+start_epoch > 0: test(epoch+start_epoch)

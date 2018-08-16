@@ -8,7 +8,7 @@ import torch.nn.functional as F
 from transformData import mu_law_encode
 
 sampleSize = 16384 * 60
-sample_rate = 16384 * 60  # the length of audio for one second
+sample_rate = 16384 * 60
 
 
 class Dataset(data.Dataset):
@@ -31,6 +31,7 @@ class Dataset(data.Dataset):
         x, y, z = h5f['x'][:], h5f['y'][:],h5f['z'][:]
         h5f.close()
 
+
         factor0 = np.random.uniform(low=0.83, high=1.0)
         factor1 = np.random.uniform(low=0.83, high=1.0)
         #print(factor0,factor1)
@@ -38,11 +39,6 @@ class Dataset(data.Dataset):
         y = y*factor1
         x = (y + z)
 
-
-        xmean = x.mean()
-        xstd = x.std()
-        x = (x - xmean) / xstd
-        y = (y - xmean) / xstd
 
         start = np.random.randint(0, x.shape[0] - sampleSize - 1, size=1)[0]
         #print(start)
@@ -52,11 +48,6 @@ class Dataset(data.Dataset):
         x = torch.from_numpy(x.reshape(1,-1)).type(torch.float32)
         y = torch.from_numpy(y.reshape(1,-1)).type(torch.float32)
 
-
-        sample = {'x': x, 'y': y}
-
-        #if self.transform:
-        #   sample = self.transform(sample)
 
         return namex,x, y
 
@@ -108,11 +99,6 @@ class Testset(data.Dataset):
 
         h5f = h5py.File('ccmixter3/' + str(namex) + '.h5', 'r')
         x, y = h5f['x'][:], h5f['y'][:]
-
-        xmean = x.mean()
-        xstd = x.std()
-        x = (x - xmean) / xstd
-        y = (y - xmean) / xstd
 
         x = torch.from_numpy(x.reshape(1,-1)).type(torch.float32)
         y = torch.from_numpy(y.reshape(1,-1)).type(torch.float32)

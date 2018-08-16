@@ -50,7 +50,8 @@ device = torch.device("cuda" if use_cuda else "cpu")
 #validation_set = Testset(np.arange(45,50), 'ccmixter3/',pad=pad)
 training_set = Dataset(np.arange(10), 'ccmixter3/',transform=None)
 validation_set = Testset(np.arange(10), 'ccmixter3/')
-loadtr = data.DataLoader(training_set, batch_size=1,shuffle=True,num_workers=2,worker_init_fn=np.random.seed)
+worker_init_fn = lambda worker_id: np.random.seed(np.random.get_state()[1][0] + worker_id)
+loadtr = data.DataLoader(training_set, batch_size=10,shuffle=True,num_workers=10,worker_init_fn=worker_init_fn)
 loadval = data.DataLoader(validation_set,batch_size=1,num_workers=2)
 # In[6]:
 
