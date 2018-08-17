@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.wav
+*.zip
 vsCorpus/*
 model/*
 # C extensions

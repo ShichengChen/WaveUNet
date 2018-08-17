@@ -1,5 +1,6 @@
 import h5py
 import numpy as np
+from transformData import *
 
 sampleSize = 16384 * 60
 sample_rate = 16384 * 60  # the length of audio for one second
@@ -19,6 +20,12 @@ for i in range(50):
     print(x.shape)
     print(exceed / x.shape[0])
 
+
+    mulawx = mu_law_encode(x)
+    print('mulaw',mulawx.mean(),mulawx.std())
+    print('test revert',np.sum(x == mu_law_decode(mu_law_encode(x))),x.shape)
+    print(x[:30])
+    print(mu_law_decode(mu_law_encode(x))[:30])
     #meany = y.mean()
     #stdy = y.std()
     #meanz = z.mean()

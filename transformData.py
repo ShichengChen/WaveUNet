@@ -11,7 +11,8 @@ def mu_law_encode(audio, quantization_channels=256):
     magnitude = np.log1p(mu * safe_audio_abs) / np.log1p(mu)
     signal = np.sign(audio) * magnitude
     # Quantize signal to the specified number of levels.
-    return ((signal + 1) / 2 * mu + 0.5).astype(int) #discretize to 0~255
+    return signal
+    #return ((signal + 1) / 2 * mu + 0.5).astype(int) #discretize to 0~255
 
 
 
@@ -19,7 +20,8 @@ def mu_law_decode(output, quantization_channels=256):
     '''Recovers waveform from quantized values.'''
     mu = quantization_channels - 1
     # Map values back to [-1, 1].
-    signal = 2 * ((output*1.0) / mu) - 1
+    #signal = 2 * ((output*1.0) / mu) - 1
+    signal = output*1.0
     # Perform inverse of mu-law transformation.
     magnitude = (1 / mu) * ((1 + mu)**np.abs(signal) - 1)
     return np.sign(signal) * magnitude

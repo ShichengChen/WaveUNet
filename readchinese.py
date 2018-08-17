@@ -6,6 +6,7 @@ import torch
 from torch.utils import data
 import torch.nn.functional as F
 from transformData import mu_law_encode
+import soundfile as sf
 
 sampleSize = 16384 * 60
 sample_rate = 16384 * 60
@@ -26,23 +27,18 @@ class Dataset(data.Dataset):
         #print('dataset',np.random.get_state()[1][0])
         np.random.seed()
         namex = self.listx[index]
+        x, _ = sf.read(self.rootx + str(namex)+'/0.wav')
+        assert (_ == 16000)
+        y, _ = sf.read(self.rootx + str(namex)+'/1.wav')
+        assert(_ == 16000)
 
-        h5f = h5py.File(self.rootx + str(namex) + '.h5', 'r')
-        x, y, z = h5f['x'][:], h5f['y'][:],h5f['z'][:]
-        h5f.close()
 
-
-        factor0 = np.random.uniform(low=0.83, high=1.0)
-        factor1 = np.random.uniform(low=0.83, high=1.0)
-        #print(factor0,factor1)
-        z = z*factor0
-        y = y*factor1
-        x = (y + z)
+        factor = np.random.uniform(low=0.83, high=1.0)
+        y = y * factor
+        x = x * factor
 
         x = mu_law_encode(x)
         y = mu_law_encode(y)
-        #xstd = x.std()
-        #x /= xstd
 
         start = np.random.randint(0, x.shape[0] - sampleSize - 1, size=1)[0]
         #print(start)
