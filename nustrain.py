@@ -17,7 +17,7 @@ from unet import Unet
 from transformData import mu_law_encode,mu_law_decode
 # In[2]:
 
-batchSize = 10
+batchSize = 1
 sampleSize = 16384*batchSize  # the length of the sample size
 sample_rate = 16384
 savemusic='vsCorpus/nus1xtr{}.wav'
@@ -51,12 +51,12 @@ training_set = Dataset(np.arange(1000), '../chinesesongs/',transform=None)
 validation_set = Testset(np.arange(1000), '../chinesesongs/')
 
 worker_init_fn = lambda worker_id: np.random.seed(np.random.get_state()[1][0] + worker_id)
-loadtr = data.DataLoader(training_set, batch_size=10,shuffle=True,num_workers=10,worker_init_fn=worker_init_fn)
-loadval = data.DataLoader(validation_set,batch_size=1,num_workers=10)
+loadtr = data.DataLoader(training_set, batch_size=100,shuffle=True,num_workers=10,worker_init_fn=worker_init_fn)
+loadval = data.DataLoader(validation_set,batch_size=1,num_workers=100)
 # In[6]:
 
 #model = Unet(skipDim, quantization_channels, residualDim,device)
-model = Unet()
+model = Unet(nefilters=64)
 #model = nn.DataParallel(model)
 model = model.cuda()
 criterion = nn.MSELoss()

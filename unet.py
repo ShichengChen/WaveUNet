@@ -5,7 +5,7 @@ import numpy as np
 
 
 class Unet(nn.Module):
-    def __init__(self):
+    def __init__(self,nefilters=24):
         super(Unet, self).__init__()
         '''
         Initialize U-net
@@ -13,7 +13,7 @@ class Unet(nn.Module):
         '''
         nlayers = 12
         self.num_layers = nlayers
-        nefilters = 24
+        self.nefilters = nefilters
         filter_size = 15
         merge_filter_size = 5
         self.upsampling = 'linear'
