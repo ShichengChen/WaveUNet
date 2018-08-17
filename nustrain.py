@@ -11,9 +11,9 @@ import torch.optim as optim
 from torch.utils import data
 from torchvision import transforms
 
-from readxy import Dataset, Testset, RandomCrop, ToTensor
+from readchinese import Dataset, Testset, RandomCrop, ToTensor
 from unet import Unet
-from tensorboardX import SummaryWriter
+
 from transformData import mu_law_encode,mu_law_decode
 # In[2]:
 
@@ -28,7 +28,7 @@ resumefile = 'model/instrument1'  # name of checkpoint
 continueTrain = False  # whether use checkpoint
 sampleCnt=0
 USEBOARD = False
-
+if(USEBOARD):from tensorboardX import SummaryWriter
 if(USEBOARD):writer = SummaryWriter()
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"

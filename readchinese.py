@@ -96,12 +96,11 @@ class Testset(data.Dataset):
     def __getitem__(self, index):
         'Generates one sample of data'
         namex = self.listx[index]
+        x, _ = sf.read(self.rootx + str(namex) + '/0.wav')
+        assert (_ == 16000)
+        y, _ = sf.read(self.rootx + str(namex) + '/1.wav')
+        assert (_ == 16000)
 
-        h5f = h5py.File('ccmixter3/' + str(namex) + '.h5', 'r')
-        x, y = h5f['x'][:], h5f['y'][:]
-
-        #xstd = x.std()
-        #x /= xstd
         x = mu_law_encode(x)
         y = mu_law_encode(y)
 
