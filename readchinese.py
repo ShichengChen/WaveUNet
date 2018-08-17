@@ -40,13 +40,14 @@ class Dataset(data.Dataset):
         x = mu_law_encode(x)
         y = mu_law_encode(y)
 
-        if(x.shape[0] >= sampleSize):
+        if(x.shape[0] > sampleSize):
             start = np.random.randint(0, x.shape[0] - sampleSize + 1, size=1)[0]
             x = x[start:start + sampleSize]
             y = y[start:start + sampleSize]
         else:
-            x = np.pad(x,(0,sampleSize - x.shape[0]),'constant', constant_values=(0))
-            y = np.pad(y, (0, sampleSize - x.shape[0]), 'constant', constant_values=(0))
+            x = np.pad(x, (0, sampleSize - x.shape[0]), 'constant', constant_values=(0))
+            y = np.pad(y, (0, sampleSize - y.shape[0]), 'constant', constant_values=(0))
+            print('xy',x.shape,y.shape,namex)
 
         x = torch.from_numpy(x.reshape(1,-1)).type(torch.float32)
         y = torch.from_numpy(y.reshape(1,-1)).type(torch.float32)

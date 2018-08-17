@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="525896a6-1108-41e5-a50e-235aa41002bc" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nustrain.py" afterPath="$PROJECT_DIR$/nustrain.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/readchinese.py" afterPath="$PROJECT_DIR$/readchinese.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -42,11 +41,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="nustrain.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="nustrain.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nustrain.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-78">
-              <caret line="21" column="19" lean-forward="false" selection-start-line="21" selection-start-column="19" selection-end-line="21" selection-end-column="19" />
+            <state relative-caret-position="-168">
+              <caret line="49" column="56" lean-forward="false" selection-start-line="49" selection-start-column="56" selection-end-line="49" selection-end-column="56" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -66,11 +65,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="readchinese.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="readchinese.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/readchinese.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="522">
-              <caret line="47" column="27" lean-forward="false" selection-start-line="47" selection-start-column="27" selection-end-line="47" selection-end-column="27" />
+            <state relative-caret-position="630">
+              <caret line="35" column="54" lean-forward="true" selection-start-line="35" selection-start-column="54" selection-end-line="35" selection-end-column="54" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -155,8 +154,8 @@
         <option value="$PROJECT_DIR$/calMeanStd.py" />
         <option value="$PROJECT_DIR$/readxy.py" />
         <option value="$PROJECT_DIR$/trainForRandomGen.py" />
-        <option value="$PROJECT_DIR$/readchinese.py" />
         <option value="$PROJECT_DIR$/nustrain.py" />
+        <option value="$PROJECT_DIR$/readchinese.py" />
       </list>
     </option>
   </component>
@@ -450,6 +449,24 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2017.2/system/remote_sources/-851153411/-672563030/numpy/lib/arraypad.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="246">
+          <caret line="1093" column="4" lean-forward="false" selection-start-line="1093" selection-start-column="4" selection-end-line="1093" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nustrain.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-168">
+          <caret line="49" column="56" lean-forward="false" selection-start-line="49" selection-start-column="56" selection-end-line="49" selection-end-column="56" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/readxy.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="198">
@@ -460,30 +477,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2017.2/system/remote_sources/-851153411/-672563030/numpy/lib/arraypad.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="246">
-          <caret line="1093" column="4" lean-forward="false" selection-start-line="1093" selection-start-column="4" selection-end-line="1093" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/readchinese.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="522">
-          <caret line="47" column="27" lean-forward="false" selection-start-line="47" selection-start-column="27" selection-end-line="47" selection-end-column="27" />
+        <state relative-caret-position="630">
+          <caret line="35" column="54" lean-forward="true" selection-start-line="35" selection-start-column="54" selection-end-line="35" selection-end-column="54" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nustrain.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-78">
-          <caret line="21" column="19" lean-forward="false" selection-start-line="21" selection-start-column="19" selection-end-line="21" selection-end-column="19" />
-          <folding>
-            <element signature="e#0#37#0" expanded="true" />
           </folding>
         </state>
       </provider>
