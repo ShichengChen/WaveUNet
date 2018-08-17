@@ -20,7 +20,6 @@ from transformData import mu_law_encode,mu_law_decode
 batchSize = 10
 sampleSize = 16384*batchSize  # the length of the sample size
 sample_rate = 16384
-songnum=45
 savemusic='vsCorpus/nus1xtr{}.wav'
 #savemusic0='vsCorpus/nus10xtr{}.wav'
 #savemusic1='vsCorpus/nus11xtr{}.wav'
@@ -48,8 +47,8 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 #training_set = Dataset(np.arange(45), 'ccmixter3/',pad=pad,transform=transform)
 #validation_set = Testset(np.arange(45,50), 'ccmixter3/',pad=pad)
-training_set = Dataset(np.arange(10), '../chinesesongs/',transform=None)
-validation_set = Testset(np.arange(10), '../chinesesongs/')
+training_set = Dataset(np.arange(1000), '../chinesesongs/',transform=None)
+validation_set = Testset(np.arange(1000), '../chinesesongs/')
 
 worker_init_fn = lambda worker_id: np.random.seed(np.random.get_state()[1][0] + worker_id)
 loadtr = data.DataLoader(training_set, batch_size=10,shuffle=True,num_workers=10,worker_init_fn=worker_init_fn)
@@ -156,4 +155,4 @@ print('training...')
 for epoch in range(100000):
     train(epoch+start_epoch)
     #test(epoch + start_epoch)
-    if (epoch+start_epoch) % 25 == 0 and epoch+start_epoch > 0: test(epoch+start_epoch)
+    if (epoch+start_epoch) % 5 == 0 and epoch+start_epoch > 0: test(epoch+start_epoch)
