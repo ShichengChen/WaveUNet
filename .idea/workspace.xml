@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="525896a6-1108-41e5-a50e-235aa41002bc" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/calMeanStd.py" afterPath="$PROJECT_DIR$/calMeanStd.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/readxy.py" afterPath="$PROJECT_DIR$/readxy.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/trainForRandomGen.py" afterPath="$PROJECT_DIR$/trainForRandomGen.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/transformData.py" afterPath="$PROJECT_DIR$/transformData.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nustrain.py" afterPath="$PROJECT_DIR$/nustrain.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -49,8 +44,8 @@
       <file leaf-file-name="nustrain.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/nustrain.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="143" column="49" lean-forward="false" selection-start-line="143" selection-start-column="49" selection-end-line="143" selection-end-column="49" />
+            <state relative-caret-position="414">
+              <caret line="50" column="54" lean-forward="false" selection-start-line="50" selection-start-column="42" selection-end-line="50" selection-end-column="54" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -488,8 +483,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/nustrain.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="143" column="49" lean-forward="false" selection-start-line="143" selection-start-column="49" selection-end-line="143" selection-end-column="49" />
+        <state relative-caret-position="414">
+          <caret line="50" column="54" lean-forward="false" selection-start-line="50" selection-start-column="42" selection-end-line="50" selection-end-column="54" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>
