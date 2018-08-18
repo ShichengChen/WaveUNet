@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="525896a6-1108-41e5-a50e-235aa41002bc" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nustrain.py" afterPath="$PROJECT_DIR$/nustrain.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/unet.py" afterPath="$PROJECT_DIR$/unet.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/trainForRandomGen.py" afterPath="$PROJECT_DIR$/trainForRandomGen.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -33,8 +33,8 @@
       <file leaf-file-name="trainForRandomGen.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/trainForRandomGen.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="378">
-              <caret line="33" column="17" lean-forward="true" selection-start-line="33" selection-start-column="17" selection-end-line="33" selection-end-column="17" />
+            <state relative-caret-position="324">
+              <caret line="54" column="24" lean-forward="false" selection-start-line="54" selection-start-column="14" selection-end-line="54" selection-end-column="24" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -42,11 +42,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="nustrain.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="nustrain.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/nustrain.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="642">
-              <caret line="51" column="0" lean-forward="true" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
+            <state relative-caret-position="1380">
+              <caret line="131" column="24" lean-forward="false" selection-start-line="131" selection-start-column="24" selection-end-line="131" selection-end-column="24" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -54,7 +54,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="unet.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="unet.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/unet.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="270">
@@ -69,7 +69,7 @@
       <file leaf-file-name="readxy.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/readxy.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="162">
+            <state relative-caret-position="-54">
               <caret line="9" column="23" lean-forward="false" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="23" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
@@ -164,8 +164,8 @@
         <option value="$PROJECT_DIR$/calMeanStd.py" />
         <option value="$PROJECT_DIR$/readxy.py" />
         <option value="$PROJECT_DIR$/readchinese.py" />
-        <option value="$PROJECT_DIR$/trainForRandomGen.py" />
         <option value="$PROJECT_DIR$/unet.py" />
+        <option value="$PROJECT_DIR$/trainForRandomGen.py" />
         <option value="$PROJECT_DIR$/nustrain.py" />
       </list>
     </option>
@@ -446,16 +446,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/readxy.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="9" column="23" lean-forward="false" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="23" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/readchinese.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-144">
@@ -466,22 +456,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/trainForRandomGen.py">
+    <entry file="file://$PROJECT_DIR$/readxy.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="33" column="17" lean-forward="true" selection-start-line="33" selection-start-column="17" selection-end-line="33" selection-end-column="17" />
+        <state relative-caret-position="-54">
+          <caret line="9" column="23" lean-forward="false" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="23" />
           <folding>
-            <element signature="e#0#37#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nustrain.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="642">
-          <caret line="51" column="0" lean-forward="true" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#37#0" expanded="true" />
+            <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -492,6 +472,26 @@
           <caret line="15" column="31" lean-forward="false" selection-start-line="15" selection-start-column="31" selection-end-line="15" selection-end-column="31" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/trainForRandomGen.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="324">
+          <caret line="54" column="24" lean-forward="false" selection-start-line="54" selection-start-column="14" selection-end-line="54" selection-end-column="24" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nustrain.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1380">
+          <caret line="131" column="24" lean-forward="false" selection-start-line="131" selection-start-column="24" selection-end-line="131" selection-end-column="24" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
           </folding>
         </state>
       </provider>

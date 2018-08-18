@@ -62,7 +62,7 @@ model = Unet()
 model = model.cuda()
 criterion = nn.MSELoss()
 # in wavenet paper, they said crossentropyloss is far better than MSELoss
-optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-6,betas=(0.9, 0.999))
+optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-6,betas=(0.5, 0.999))
 # use adam to train
 
 maxloss=np.zeros(50)+100
