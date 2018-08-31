@@ -8,8 +8,8 @@ import torch.nn.functional as F
 import soundfile as sf
 from transformData import mu_law_encode,quan_mu_law_encode
 
-sampleSize = 16384 * 10
-sample_rate = 16384 * 10
+sampleSize = 16384 * 60
+sample_rate = 16384 * 60
 
 
 class Dataset(data.Dataset):
@@ -29,24 +29,36 @@ class Dataset(data.Dataset):
         #print('dataset',np.random.get_state()[1][0])
         np.random.seed()
         namex = self.listx[index]
-        x, _ = sf.read(self.rootx + str(namex) + '/0.wav')
+        x, _ = sf.read(self.rootx + 'x/' + str(namex) + '.wav')
         assert (_ == 16000)
-        y, _ = sf.read(self.rootx + str(namex) + '/1.wav')
+        y, _ = sf.read(self.rootx + 'y/' + str(namex) + '.wav')
+        assert (_ == 16000)
+        z, _ = sf.read(self.rootx + 'z/' + str(namex) + '.wav')
         assert (_ == 16000)
         assert (x.shape == y.shape)
 
 
+        factor0 = np.random.uniform(low=0.83, high=1.0)
+        factor1 = np.random.uniform(low=0.83, high=1.0)
+        #print(factor0,factor1)
+        z = z*factor0
+        y = y*factor1
+        x = (y + z)
+
         x = mu_law_encode(x)
         y = mu_law_encode(y)
 
-        if (x.shape[0] > sampleSize):
-            start = np.random.randint(0, x.shape[0] - sampleSize + 1, size=1)[0]
-            x = x[start:start + sampleSize]
-            y = y[start:start + sampleSize]
-        else:
-            x = np.pad(x, (0, sampleSize - x.shape[0]), 'constant', constant_values=(0))
-            y = np.pad(y, (0, sampleSize - y.shape[0]), 'constant', constant_values=(0))
-            print('xy', x.shape, y.shape, namex)
+        if(x.shape[0] <= sampleSize):
+            while (x.shape[0] <= sampleSize):
+                x = np.concatenate((x, x))
+                y = np.concatenate((y, y))
+            assert (x.shape==y.shape)
+            #print('xy', x.shape, y.shape, namex)
+
+
+        start = np.random.randint(0, x.shape[0] - sampleSize + 1, size=1)[0]
+        x = x[start:start + sampleSize]
+        y = y[start:start + sampleSize]
 
         x = torch.from_numpy(x.reshape(1,-1)).type(torch.float32)
         y = torch.from_numpy(y.reshape(1, -1)).type(torch.float32)
@@ -95,23 +107,27 @@ class Valtset(data.Dataset):
         'Generates one sample of data'
         np.random.seed()
         namex = self.listx[index]
-        x, _ = sf.read(self.rootx + str(namex) + '/0.wav')
+        x, _ = sf.read(self.rootx + 'x/' + str(namex) + '.wav')
         assert (_ == 16000)
-        y, _ = sf.read(self.rootx + str(namex) + '/1.wav')
+        y, _ = sf.read(self.rootx + 'y/' + str(namex) + '.wav')
+        assert (_ == 16000)
+        z, _ = sf.read(self.rootx + 'z/' + str(namex) + '.wav')
         assert (_ == 16000)
         assert (x.shape == y.shape)
 
         x = mu_law_encode(x)
         y = mu_law_encode(y)
 
-        if (x.shape[0] > sampleSize):
-            start = np.random.randint(0, x.shape[0] - sampleSize + 1, size=1)[0]
-            x = x[start:start + sampleSize]
-            y = y[start:start + sampleSize]
-        else:
-            x = np.pad(x, (0, sampleSize - x.shape[0]), 'constant', constant_values=(0))
-            y = np.pad(y, (0, sampleSize - y.shape[0]), 'constant', constant_values=(0))
-            print('xy', x.shape, y.shape, namex)
+        if (x.shape[0] <= sampleSize):
+            while (x.shape[0] <= sampleSize):
+                x = np.concatenate((x, x))
+                y = np.concatenate((y, y))
+            assert (x.shape == y.shape)
+            #print('xy', x.shape, y.shape, namex)
+
+        start = np.random.randint(0, x.shape[0] - sampleSize + 1, size=1)[0]
+        x = x[start:start + sampleSize]
+        y = y[start:start + sampleSize]
 
         x = torch.from_numpy(x.reshape(1, -1)).type(torch.float32)
         y = torch.from_numpy(y.reshape(1, -1)).type(torch.float32)
@@ -135,9 +151,9 @@ class Testset(data.Dataset):
     def __getitem__(self, index):
         'Generates one sample of data'
         namex = self.listx[index]
-        x, _ = sf.read(self.rootx + str(namex) + '/0.wav')
+        x, _ = sf.read(self.rootx + 'x/' + str(namex) + '.wav')
         assert (_ == 16000)
-        y, _ = sf.read(self.rootx + str(namex) + '/1.wav')
+        y, _ = sf.read(self.rootx + 'y/' + str(namex) + '.wav')
         assert (_ == 16000)
         assert (x.shape == y.shape)
 

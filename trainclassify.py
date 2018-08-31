@@ -11,26 +11,26 @@ import torch.optim as optim
 from torch.utils import data
 from torchvision import transforms
 
-from readccmu import Dataset, Testset,Valtset
+from readxy import Dataset, Testset,Valtset
 #from unet import Unet
-from modelStruct.pyramidnet import Unet
-#from modelStruct.unet import Unet
+from modelStruct.quanunet import Unet
 from tensorboardX import SummaryWriter
-from transformData import mu_law_encode,mu_law_decode
+from transformData import mu_law_encode,mu_law_decode,quan_mu_law_decode
 # In[2]:
 
-batchSize = 1
+batchSize = 10
 sampleSize = 16384*batchSize  # the length of the sample size
 sample_rate = 16384
 songnum=45
-savemusic='vsCorpus/pyramidccmu{}.wav'
+savemusic='vsCorpus/nus1xtr{}.wav'
 #savemusic0='vsCorpus/nus10xtr{}.wav'
 #savemusic1='vsCorpus/nus11xtr{}.wav'
-resumefile = 'model/pyramid'  # name of checkpoint
+resumefile = 'model/instrument1'  # name of checkpoint
 continueTrain = False  # whether use checkpoint
 sampleCnt=0
 USEBOARD = True
-quan=False
+quan=True
+
 if(USEBOARD):writer = SummaryWriter()
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -39,8 +39,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # use specific GPU
 # In[4]:
 from datetime import datetime
 current_time = datetime.now().strftime('%b%d_%H-%M-%S')
-if(USEBOARD):writer = SummaryWriter(log_dir='../conditioned-wavenet/runs/'+str(current_time)+'cc+musdbwav,15filtersize,60second,pyramidnet',comment="uwavenet")
-
+if(USEBOARD):writer = SummaryWriter(log_dir='../conditioned-wavenet/runs/'+str(current_time)+'quan'+str(quan)+',mulaw,45batch,lr-3',comment="uwavenet")
 
 use_cuda = torch.cuda.is_available()  # whether have available GPU
 torch.manual_seed(1)
@@ -51,29 +50,28 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 #training_set = Dataset(np.arange(45), 'ccmixter3/',pad=pad,transform=transform)
 #validation_set = Testset(np.arange(45,50), 'ccmixter3/',pad=pad)
-training_set = Dataset(np.arange(150), 'ccmixter2/')
-test_set = Testset(np.arange(140,160), 'ccmixter2/')
-validation_set =Valtset(np.arange(150,200), 'ccmixter2/')
+training_set = Dataset(np.arange(45), 'ccmixter3/',quan=quan)
+test_set = Testset(np.arange(50), 'ccmixter3/',quan=quan)
+validation_set =Valtset(np.arange(45,50), 'ccmixter3/',quan=quan)
 
 
 worker_init_fn = lambda worker_id: np.random.seed(np.random.get_state()[1][0] + worker_id)
-loadtr = data.DataLoader(training_set, batch_size=75,shuffle=True,num_workers=10,worker_init_fn=worker_init_fn)
+loadtr = data.DataLoader(training_set, batch_size=45,shuffle=True,num_workers=10,worker_init_fn=worker_init_fn)
 loadtest = data.DataLoader(test_set,batch_size=1,num_workers=10)
-loadval = data.DataLoader(validation_set,batch_size=50,num_workers=10,worker_init_fn=worker_init_fn)
+loadval = data.DataLoader(validation_set,batch_size=5,num_workers=10,worker_init_fn=worker_init_fn)
 # In[6]:
 
 #model = Unet(skipDim, quantization_channels, residualDim,device)
 model = Unet()
 #model = nn.DataParallel(model)
 model = model.cuda()
-criterion = nn.MSELoss()
+criterion = nn.CrossEntropyLoss()
 # in wavenet paper, they said crossentropyloss is far better than MSELoss
-optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-6,betas=(0.9, 0.999))
+optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-6)
 # use adam to train
-#print(model)
-#print(model.parameters())
-maxloss=np.zeros(50)+100
 
+maxloss=np.zeros(50)+100
+# In[7]:
 iteration = 0
 start_epoch=0
 if continueTrain:  # if continueTrain, the program will find the checkpoints
@@ -102,15 +100,15 @@ def test(epoch):  # testing data
             listofpred0 = []
             cnt,aveloss=0,0
             for ind in range(0, xtrain.shape[-1] - sampleSize, sampleSize):
-                #output = model(xtrain[:, :, ind:ind + sampleSize].to(device), torch.randint(0, 1, (24,)))
                 output = model(xtrain[:, :,ind:ind + sampleSize].to(device))
-                listofpred0.append(output.reshape(-1))
-                loss = criterion(output, (ytrain[:, :,ind:ind + sampleSize].to(device)))
-                cnt+=1
+                loss = criterion(output, (ytrain[:, ind:ind + sampleSize].to(device)))
+                cnt += 1
                 aveloss += float(loss)
+                _,output = torch.max(output,1)
+                listofpred0.append(output.reshape(-1))
             aveloss /= cnt
             print('loss for test:{},num{},epoch{}'.format(aveloss, iloader,epoch))
-            ans0 = mu_law_decode(np.concatenate(listofpred0))
+            ans0 = quan_mu_law_decode(np.concatenate(listofpred0))
             if not os.path.exists('vsCorpus/'): os.makedirs('vsCorpus/')
             sf.write(savemusic.format(iloader), ans0, sample_rate)
             print('test stored done', np.round(time.time() - start_time))
@@ -121,10 +119,9 @@ def val(epoch):
     cnt, aveloss = 0, 0
     with torch.no_grad():
         for iloader, xtrain, ytrain in loadval:
-            for ind in range(0, xtrain.shape[-1], sampleSize//batchSize):
-                if (xtrain[0, 0, ind:ind + sampleSize].shape[0] < (sampleSize)): break
+            for ind in range(0, xtrain.shape[-1] - sampleSize, sampleSize):
                 output = model(xtrain[:, :, ind:ind + sampleSize].to(device))
-                loss = criterion(output, (ytrain[:, :, ind:ind + sampleSize].to(device)))
+                loss = criterion(output, (ytrain[:, ind:ind + sampleSize].to(device)))
                 cnt += 1
                 aveloss += float(loss)
         aveloss /= cnt
@@ -134,23 +131,22 @@ def val(epoch):
 def train(epoch):  # training data, the audio except for last 15 seconds
     for iloader,xtrain, ytrain in loadtr:
         startx = 0
-        idx = np.arange(startx, xtrain.shape[-1], sampleSize//batchSize)
-        #np.random.shuffle(idx)
+        idx = np.arange(startx, xtrain.shape[-1] - sampleSize, sampleSize//batchSize)
+        np.random.shuffle(idx)
+        #lens = 100
+        #idx = idx[:lens]
         cnt, aveloss = 0, 0
         start_time = time.time()
         model.train()
         for i, ind in enumerate(idx):
-            if (xtrain[0, 0, ind:ind + sampleSize].shape[0] < (sampleSize)): break
-            data = xtrain[:, :, ind:ind + sampleSize].to(device)
-            target = ytrain[:, :,ind:ind + sampleSize].to(device)
+            data = xtrain[:, :, ind:ind + sampleSize//batchSize].to(device)
+            target = ytrain[:, ind:ind + sampleSize//batchSize].to(device)
+            #print(data.shape,target.shape)
             optimizer.zero_grad()
-            #output = model(data,torch.randint(0, 1, (24,)))
             output = model(data)
-            #print(model.decoder0[0].weight[0])
             loss = criterion(output, target)
             aveloss+=float(loss)
             cnt+=1
-
             loss.backward()
             optimizer.step()
             global sampleCnt
@@ -183,4 +179,4 @@ for epoch in range(100000):
     train(epoch+start_epoch)
     val(epoch+start_epoch)
     #test(epoch + start_epoch)
-    if (epoch+start_epoch) % 100 == 0 and epoch+start_epoch > 0: test(epoch+start_epoch)
+    if (epoch+start_epoch) % 25 == 0 and epoch+start_epoch > 0: test(epoch+start_epoch)

@@ -7,10 +7,7 @@ import numpy as np
 class Unet(nn.Module):
     def __init__(self,nefilters=24):
         super(Unet, self).__init__()
-        '''
-        Initialize U-net
-        :param num_layers: Number of down- and upscaling layers in the network 
-        '''
+        print('qanunet')
         nlayers = 12
         self.num_layers = nlayers
         self.nefilters = nefilters
@@ -33,32 +30,25 @@ class Unet(nn.Module):
             self.ebatch.append(nn.BatchNorm1d(echannelout[i]))
             self.dbatch.append(nn.BatchNorm1d(dchannelout[i]))
         self.middle=nn.Conv1d(echannelout[-1],echannelout[-1],filter_size,padding=filter_size//2)
-        self.out = nn.Conv1d(nefilters+1,1,1)
+        self.out = nn.Conv1d(nefilters+1,256,1)
     def forward(self,x):
         encoder = list()
         input = x
         for i in range(self.num_layers):
             x = self.encoder[i](x)
             x = self.ebatch[i](x)
-            x = F.leaky_relu(x,0.2)
+            x = F.relu(x,0.1)
             encoder.append(x)
             x = x[:,:,::2]
         x = self.middle(x)
-        x = F.leaky_relu(x, 0.2)
-        #print(x.shape)
+        x = F.relu(x, 0.1)
         for i in range(self.num_layers):
-            #print(x.shape)
-            #x = torch.unsqueeze(x, 2)
-            #print(x.shape)
-            x = F.upsample(x,scale_factor=2,mode='linear')
-            #print(i,x.shape,encoder[self.num_layers - i - 1].shape)
-            #x = torch.squeeze(x, 2)
+            x = F.upsample(x,scale_factor=2,mode='linear',align_corners=False)
             x = torch.cat([x,encoder[self.num_layers - i - 1]],dim=1)
             x = self.decoder[i](x)
             x = self.dbatch[i](x)
-            x = F.leaky_relu(x,0.2)
+            x = F.relu(x,0.1)
         x = torch.cat([x,input],dim=1)
         x = self.out(x)
-        x = F.tanh(x)
         return x
 

@@ -11,33 +11,33 @@ import torch.optim as optim
 from torch.utils import data
 from torchvision import transforms
 
-from readxy import Dataset, Testset, RandomCrop, ToTensor
-from unet import Unet
+from readxy import Dataset, Testset, RandomCrop, ToTensor,Valtset
+from modelStruct.unetd import UnetD
 from tensorboardX import SummaryWriter
-
-writer = SummaryWriter()
+from transformData import mu_law_encode,mu_law_decode
 # In[2]:
 
 batchSize = 10
 sampleSize = 16384*batchSize  # the length of the sample size
 sample_rate = 16384
 songnum=45
-savemusic='vsCorpus/nus1xtr{}.wav'
+savemusic='vsCorpus/nus2xtr{}.wav'
 #savemusic0='vsCorpus/nus10xtr{}.wav'
 #savemusic1='vsCorpus/nus11xtr{}.wav'
-resumefile = 'model/instrument1'  # name of checkpoint
+resumefile = 'model/instrument2'  # name of checkpoint
 continueTrain = False  # whether use checkpoint
-lossrecord = []  # list for record loss
 sampleCnt=0
+USEBOARD = True
 
+if(USEBOARD):writer = SummaryWriter()
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # use specific GPU
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # use specific GPU
 
 # In[4]:
 from datetime import datetime
 current_time = datetime.now().strftime('%b%d_%H-%M-%S')
-writer = SummaryWriter(log_dir='../conditioned-wavenet/runs/'+str(current_time),comment="uwavenet")
+if(USEBOARD):writer = SummaryWriter(log_dir='../conditioned-wavenet/runs/'+str(current_time)+',mulaw,0.1leaky,dilation,45batch',comment="uwavenet")
 
 use_cuda = torch.cuda.is_available()  # whether have available GPU
 torch.manual_seed(1)
@@ -48,20 +48,24 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 #training_set = Dataset(np.arange(45), 'ccmixter3/',pad=pad,transform=transform)
 #validation_set = Testset(np.arange(45,50), 'ccmixter3/',pad=pad)
-training_set = Dataset(np.arange(10), 'ccmixter3/',transform=None)
-validation_set = Testset(np.arange(10), 'ccmixter3/')
+training_set = Dataset(np.arange(45), 'ccmixter3/',transform=None)
+test_set = Testset(np.arange(50), 'ccmixter3/')
+validation_set =Valtset(np.arange(45,50), 'ccmixter3/')
+
+
 worker_init_fn = lambda worker_id: np.random.seed(np.random.get_state()[1][0] + worker_id)
-loadtr = data.DataLoader(training_set, batch_size=10,shuffle=True,num_workers=10,worker_init_fn=worker_init_fn)
-loadval = data.DataLoader(validation_set,batch_size=1,num_workers=2)
+loadtr = data.DataLoader(training_set, batch_size=45,shuffle=True,num_workers=10,worker_init_fn=worker_init_fn)
+loadtest = data.DataLoader(test_set,batch_size=1,num_workers=10)
+loadval = data.DataLoader(validation_set,batch_size=5,num_workers=10,worker_init_fn=worker_init_fn)
 # In[6]:
 
 #model = Unet(skipDim, quantization_channels, residualDim,device)
-model = Unet()
+model = UnetD()
 #model = nn.DataParallel(model)
 model = model.cuda()
 criterion = nn.MSELoss()
 # in wavenet paper, they said crossentropyloss is far better than MSELoss
-optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-6)
+optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-6,betas=(0.5, 0.999))
 # use adam to train
 
 maxloss=np.zeros(50)+100
@@ -74,7 +78,6 @@ if continueTrain:  # if continueTrain, the program will find the checkpoints
         checkpoint = torch.load(resumefile)
         start_epoch = checkpoint['epoch']
         iteration = checkpoint['iteration']
-        # best_prec1 = checkpoint['best_prec1']
         model.load_state_dict(checkpoint['state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         print("=> loaded checkpoint '{}' (epoch {})"
@@ -90,7 +93,7 @@ def test(epoch):  # testing data
     model.eval()
     start_time = time.time()
     with torch.no_grad():
-        for iloader, xtrain, ytrain in loadval:
+        for iloader, xtrain, ytrain in loadtest:
             iloader=iloader.item()
             listofpred0 = []
             cnt,aveloss=0,0
@@ -101,37 +104,45 @@ def test(epoch):  # testing data
                 cnt+=1
                 aveloss += float(loss)
             aveloss /= cnt
-            print('loss for validation:{},num{},epoch{}'.format(aveloss, iloader,epoch))
-            ans0 = np.concatenate(listofpred0)
+            print('loss for test:{},num{},epoch{}'.format(aveloss, iloader,epoch))
+            ans0 = mu_law_decode(np.concatenate(listofpred0))
             if not os.path.exists('vsCorpus/'): os.makedirs('vsCorpus/')
             sf.write(savemusic.format(iloader), ans0, sample_rate)
             print('test stored done', np.round(time.time() - start_time))
 
-
+def val(epoch):
+    model.eval()
+    start_time = time.time()
+    cnt, aveloss = 0, 0
+    with torch.no_grad():
+        for iloader, xtrain, ytrain in loadval:
+            for ind in range(0, xtrain.shape[-1] - sampleSize, sampleSize):
+                output = model(xtrain[:, :, ind:ind + sampleSize].to(device))
+                loss = criterion(output, (ytrain[:, :, ind:ind + sampleSize].to(device)))
+                cnt += 1
+                aveloss += float(loss)
+        aveloss /= cnt
+        print('loss for validation:{},epoch{},valtime{}'.format(aveloss, epoch,np.round(time.time() - start_time)))
+        if (USEBOARD): writer.add_scalar('waveunet val loss', aveloss, iteration)
 
 def train(epoch):  # training data, the audio except for last 15 seconds
     for iloader,xtrain, ytrain in loadtr:
-        iloader=int(iloader)
-        startx = np.random.randint(0,sampleSize)
-        #startx = 0
-        idx = np.arange(startx, xtrain.shape[-1] - sampleSize, sampleSize)
+        startx = 0
+        idx = np.arange(startx, xtrain.shape[-1] - sampleSize, sampleSize//batchSize)
         np.random.shuffle(idx)
         #lens = 100
         #idx = idx[:lens]
         cnt, aveloss = 0, 0
         start_time = time.time()
+        model.train()
         for i, ind in enumerate(idx):
-            model.train()
-            data = xtrain[:, :, ind:ind + sampleSize].to(device)
-            target = ytrain[:, :,ind:ind + sampleSize].to(device)
-            data = data.view(batchSize,1,-1)
-            target = target.view(batchSize, 1, -1)
+            data = xtrain[:, :, ind:ind + sampleSize//batchSize*2].to(device)
+            target = ytrain[:, :,ind:ind + sampleSize//batchSize*2].to(device)
+            optimizer.zero_grad()
             output = model(data)
             loss = criterion(output, target)
             aveloss+=float(loss)
             cnt+=1
-            lossrecord.append(float(loss))
-            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             global sampleCnt
@@ -139,12 +150,15 @@ def train(epoch):  # training data, the audio except for last 15 seconds
             if sampleCnt % 10000 == 0 and sampleCnt > 0:
                 for param in optimizer.param_groups:
                     param['lr'] *= 0.98
+                    #if(param['lr'] < 1e-5):param['lr'] = 1e-5
         global iteration
         iteration += 1
-        print('loss for train:{:.3f},num{},epoch{},({:.3f} sec/step)'.format(
-            aveloss / cnt, iloader, epoch,time.time() - start_time))
-        writer.add_scalar('waveunet loss', (aveloss / cnt), iteration)
-    if epoch % 10 == 0:
+        print('loss for train:{:.6f},epoch{},({:.3f} sec/step)'.format(
+            aveloss / cnt, epoch,time.time() - start_time))
+
+        if (USEBOARD): writer.add_scalar('waveunet loss', (aveloss / cnt), iteration)
+
+    if epoch % 5 == 0:
         if not os.path.exists('model/'): os.makedirs('model/')
         state = {'epoch': epoch,
                  'state_dict': model.state_dict(),
@@ -159,5 +173,6 @@ def train(epoch):  # training data, the audio except for last 15 seconds
 print('training...')
 for epoch in range(100000):
     train(epoch+start_epoch)
+    val(epoch+start_epoch)
     #test(epoch + start_epoch)
-    if (epoch+start_epoch) % 6 == 0 and epoch+start_epoch > 0: test(epoch+start_epoch)
+    if (epoch+start_epoch) % 25 == 0 and epoch+start_epoch > 0: test(epoch+start_epoch)
