@@ -14,7 +14,7 @@ implement Wave-U-Net by pytorch
 - please put accompaniments in folder ccmixter2/y
 - please put vocal songs in folder ccmixter2/z
 - please name songs as 0.wav, 1.wav, 2.wav etc in folder ccmixter2/x, ccmixter2/y and ccmixter2/z respectively.
-- all Audio rates are *16000* and *Mono* instead of stereo 
+- all Audio rates I read are **16000** and **Mono**. 
 - I use all ccmixter songs and musdb18 songs, which includes 200 songs.
 - training_set = Dataset(np.arange(150), 'ccmixter2/')
 - test_set = Testset(np.arange(140,160), 'ccmixter2/')
@@ -45,4 +45,4 @@ implement Wave-U-Net by pytorch
  - randomunet.py(my experiment, use random dilation rate, which is inspired by https://arxiv.org/abs/1808.03578)
  - unet.py([use classical wave-u-net](https://qmro.qmul.ac.uk/xmlui/bitstream/handle/123456789/39785/Stoller%20Wave-U-Net%202018%20Accepted.pdf?sequence=1))
  - unetd.py(use wave-u-net with dilation filters)
- - resunet.py
+ - resunet.py(wanna combine unet and resnet)
