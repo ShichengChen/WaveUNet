@@ -4,7 +4,7 @@ implement Wave-U-Net by pytorch
 
 # Train network
 - trainForRandomGen.py (current best result)
-- you can change the neural network model
+- If you want to change the neural network model
 - from modelStruct.pyramidnet import Unet[1]
 - from modelStruct.unet import Unet[2])
 - you can choose one between these two.
