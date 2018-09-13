@@ -4,11 +4,11 @@ implement Wave-U-Net by pytorch
 
 # Train network
 - if you just want to train the model, use commandTrain.py
-'''
+```
 python commandTrain.py --dataset both ##(for both ccmixter and musdb18)
 python commandTrain.py --dataset ccmixter ##(for ccmixter only)
 python commandTrain.py --dataset musdb18 ##(for musdb18 only)
-'''
+```
 - trainForRandomGen.py (current best result)
 - If you want to change the neural network model
 - from modelStruct.pyramidnet import Unet[1]
