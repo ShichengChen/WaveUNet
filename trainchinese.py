@@ -11,7 +11,7 @@ import torch.optim as optim
 from torch.utils import data
 from torchvision import transforms
 
-from readchinese import Dataset, Testset,Valtset
+from readDataset.readchinese import Dataset, Testset,Valtset
 #from unet import Unet
 from modelStruct.unet import Unet
 from tensorboardX import SummaryWriter
