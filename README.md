@@ -28,3 +28,21 @@ implement Wave-U-Net by pytorch
  - soundfile
  - h5py
  - numpy
+# describe files
+## different start points
+ - trainForRandomGen.py (use ccmixter and musdb as dataset to train model)
+ - trainchinese.py (use chinese songs as dataset to train model)
+ - trainclassify.py (use classification instead regression, classification can also generalize as good as regression but much more noise)
+## tools
+ - transformData.py (same as utils file)
+## read Dataset
+ - readccmu.py (read ccmixter and musdb18)
+ - readchinese.py (read 20000 songs)
+ - readpiano.py (read piano songs which is download from youtube to train wavenet, but now it is useless)
+## model structure(all in folder modelStruct)
+ - pyramidnet.py(in the middle of nework, use different dilation rate filters to extract features, learned from deep lab series)
+ - quanunet.py(use softmax as loss fuction)
+ - randomunet.py(my experiment, use random dilation rate, which is inspired by https://arxiv.org/abs/1808.03578)
+ - unet.py([use classical wave-u-net](https://qmro.qmul.ac.uk/xmlui/bitstream/handle/123456789/39785/Stoller%20Wave-U-Net%202018%20Accepted.pdf?sequence=1))
+ - unetd.py(use wave-u-net with dilation filters)
+ - resunet.py
