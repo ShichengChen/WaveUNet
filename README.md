@@ -3,6 +3,12 @@ implement Wave-U-Net by pytorch
 
 
 # Train network
+- if you just want to train the model, use commandTrain.py
+'''
+python commandTrain.py --dataset both ##(for both ccmixter and musdb18)
+python commandTrain.py --dataset ccmixter ##(for ccmixter only)
+python commandTrain.py --dataset musdb18 ##(for musdb18 only)
+'''
 - trainForRandomGen.py (current best result)
 - If you want to change the neural network model
 - from modelStruct.pyramidnet import Unet[1]
@@ -13,7 +19,11 @@ implement Wave-U-Net by pytorch
 - please put mix songs in folder ccmixter2/x
 - please put accompaniments in folder ccmixter2/y
 - please put vocal songs in folder ccmixter2/z
+- *first 50 songs are ccmixter and last 150 songs are musdb18*.
 - please name songs as 0.wav, 1.wav, 2.wav etc in folder ccmixter2/x, ccmixter2/y and ccmixter2/z respectively.
+- if you only use ccmixter, you should have 0.wav, 2.wav, to 49.wav.
+- if you only use musdb18, you should have 50.wav, 51.wav, to 199.wav.
+- if you want to use both ccmixter and musdb18, you should have 0.wav, 1.wav, 2.wav, 3.wav, to 199.wav.
 - all Audio rates I read are **16000** and **Mono**. 
 - I use all ccmixter songs and musdb18 songs, which includes 200 songs.
 - training_set = Dataset(np.arange(150), 'ccmixter2/')
