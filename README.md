@@ -18,6 +18,7 @@ python commandTrain.py --dataset musdb18
 - you can choose one between these two.
 
 # Inference
+- If you have one or more mix songs, you can use inference.py to predict accompaniments by using these mix songs and a saved model. 
 ```
 python inference.py --checkpoint pyramid --test_number 1
 ##(please type checkpoints name and number of test songs)
