@@ -8,6 +8,9 @@ vsCorpus/*
 model/*
 # C extensions
 *.so
+ccmixter2/*
+model/*
+vsCorpus/*
 runs/*
 # Distribution / packaging
 .Python

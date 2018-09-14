@@ -10,7 +10,7 @@ args = parser.parse_args()
 
 print('dataset:',args.dataset)
 #print(args.epochs)
-assert(args.dataset == 'both' or args.dataset == 'musdb18' or args.dataset == 'ccmixter')
+assert(args.dataset == 'both' or args.dataset == 'musdb18' or args.dataset == 'ccmixter' or args.dataset == 'test')
 
 import os
 import time
@@ -26,8 +26,8 @@ from torch.utils import data
 
 from readDataset.readccmu import Dataset, Testset,Valtset
 #from unet import Unet
-from modelStruct.pyramidnet import Unet
-#from modelStruct.unet import Unet
+#from modelStruct.pyramidnet import Unet
+from modelStruct.unet import Unet
 
 from transformData import mu_law_encode,mu_law_decode
 # In[2]:
@@ -42,7 +42,7 @@ savemusic='vsCorpus/pyramidccmu{}.wav'
 resumefile = 'model/pyramid'  # name of checkpoint
 continueTrain = False  # whether use checkpoint
 sampleCnt=0
-USEBOARD = True
+USEBOARD = False
 quan=False
 if(USEBOARD):
     from tensorboardX import SummaryWriter
@@ -51,12 +51,6 @@ if(USEBOARD):
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # use specific GPU
 
-parser = argparse.ArgumentParser(description='PyTorch unet')
-parser.add_argument('--dataset', type=str, default='both',
-                    help='dataset for training, you can choose 1.ccmixter,2.musdb18,3.both(default: both)')
-parser.add_argument('--epochs', type=int, default=100000, metavar='N',
-                    help='number of epochs to train (default: 100000)')
-args = parser.parse_args([])
 
 # In[4]:
 from datetime import datetime
@@ -79,6 +73,10 @@ elif (args.dataset == 'musdb18'):
     training_set = Dataset(np.arange(50,150), 'ccmixter2/')
     test_set = Testset(np.arange(140, 160), 'ccmixter2/')
     validation_set = Valtset(np.arange(150, 200), 'ccmixter2/')
+elif (args.dataset == 'test'):
+    training_set = Dataset(np.arange(1), 'ccmixter2/')
+    test_set = Testset(np.arange(1), 'ccmixter2/')
+    validation_set = Valtset(np.arange(1), 'ccmixter2/')
 
 
 use_cuda = torch.cuda.is_available()  # whether have available GPU
@@ -95,6 +93,9 @@ elif (args.dataset == 'ccmixter'):
 elif (args.dataset == 'musdb18'):
     loadtr = data.DataLoader(training_set, batch_size=50,shuffle=True,num_workers=10, worker_init_fn=worker_init_fn)
     loadval = data.DataLoader(validation_set, batch_size=50, num_workers=10, worker_init_fn=worker_init_fn)
+elif (args.dataset == 'test'):
+    loadtr = data.DataLoader(training_set, batch_size=1, shuffle=True, num_workers=1, worker_init_fn=worker_init_fn)
+    loadval = data.DataLoader(validation_set, batch_size=1, num_workers=1, worker_init_fn=worker_init_fn)
 loadtest = data.DataLoader(test_set,batch_size=1,num_workers=10)
 # In[6]:
 
