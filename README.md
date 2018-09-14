@@ -5,14 +5,24 @@ implement Wave-U-Net by pytorch
 # Train network
 - if you just want to train the model, use commandTrain.py
 ```
-python commandTrain.py --dataset both ##(for both ccmixter and musdb18)
-python commandTrain.py --dataset ccmixter ##(for ccmixter only)
-python commandTrain.py --dataset musdb18 ##(for musdb18 only)
+python commandTrain.py --dataset both 
+##(for both ccmixter and musdb18)
+python commandTrain.py --dataset ccmixter 
+##(for ccmixter only)
+python commandTrain.py --dataset musdb18 
+##(for musdb18 only)
 ```
 - If you want to change the neural network model
 - from modelStruct.pyramidnet import Unet[1]
 - from modelStruct.unet import Unet[2])
 - you can choose one between these two.
+
+# Inferencetest_number
+```
+python inference.py --checkpoint pyramid --test_number 1
+##(please type checkpoints name and number of test songs)
+##(please name test songs as 0.wav, 1.wav, 2.wav etc)
+```
 
 # Dataset
 - please put mix songs in folder ccmixter2/x
