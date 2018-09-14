@@ -17,7 +17,7 @@ python commandTrain.py --dataset musdb18
 - from modelStruct.unet import Unet[2])
 - you can choose one between these two.
 
-# Inferencetest_number
+# Inference
 ```
 python inference.py --checkpoint pyramid --test_number 1
 ##(please type checkpoints name and number of test songs)
