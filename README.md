@@ -23,6 +23,7 @@ python commandTrain.py --dataset musdb18
 python inference.py --checkpoint pyramid --test_number 1
 ##(please type checkpoints name and number of test songs)
 ##(please name test songs as 0.wav, 1.wav, 2.wav etc)
+##(please put test songs in folder ccmixter2/x)
 ```
 
 # Dataset
