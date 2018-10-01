@@ -11,7 +11,8 @@ import torch.optim as optim
 from torch.utils import data
 from torchvision import transforms
 
-from readDataset.readccmu import Dataset, Testset,Valtset
+from readccmu import Dataset, Testset,Valtset
+#from unet import Unet
 #from modelStruct.pyramidnet import Unet
 from modelStruct.unet import Unet
 from tensorboardX import SummaryWriter
@@ -22,13 +23,13 @@ batchSize = 1
 sampleSize = 16384*batchSize  # the length of the sample size
 sample_rate = 16384
 songnum=45
-savemusic='vsCorpus/pyramidccmu{}.wav'
+savemusic='vsCorpus/unet{}.wav'
 #savemusic0='vsCorpus/nus10xtr{}.wav'
 #savemusic1='vsCorpus/nus11xtr{}.wav'
-resumefile = 'model/pyramid'  # name of checkpoint
+#resumefile = 'model/saveForTransfer1'  # name of checkpoint
 continueTrain = False  # whether use checkpoint
 sampleCnt=0
-USEBOARD = False
+USEBOARD = True
 quan=False
 if(USEBOARD):writer = SummaryWriter()
 
@@ -38,7 +39,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # use specific GPU
 # In[4]:
 from datetime import datetime
 current_time = datetime.now().strftime('%b%d_%H-%M-%S')
-if(USEBOARD):writer = SummaryWriter(log_dir='../conditioned-wavenet/runs/'+str(current_time)+'cc+musdbwav,15filtersize,60second,pyramidnet',comment="uwavenet")
+if(USEBOARD):writer = SummaryWriter(log_dir='../conditioned-wavenet/runs/'+str(current_time)+'cc+muForTransfer',comment="uwavenet")
 
 
 use_cuda = torch.cuda.is_available()  # whether have available GPU
@@ -50,12 +51,10 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 #training_set = Dataset(np.arange(45), 'ccmixter3/',pad=pad,transform=transform)
 #validation_set = Testset(np.arange(45,50), 'ccmixter3/',pad=pad)
-#training_set = Dataset(np.arange(150), 'ccmixter2/')
-#test_set = Testset(np.arange(140,160), 'ccmixter2/')
-#validation_set =Valtset(np.arange(150,200), 'ccmixter2/')
-training_set = Dataset(np.arange(1), 'ccmixter2/')
-test_set = Dataset(np.arange(1), 'ccmixter2/')
-validation_set =Valtset(np.arange(1), 'ccmixter2/')
+training_set = Dataset(np.arange(150), 'ccmixter2/')
+test_set = Testset(np.arange(140,160), 'ccmixter2/')
+validation_set =Valtset(np.arange(150,200), 'ccmixter2/')
+
 
 worker_init_fn = lambda worker_id: np.random.seed(np.random.get_state()[1][0] + worker_id)
 loadtr = data.DataLoader(training_set, batch_size=75,shuffle=True,num_workers=10,worker_init_fn=worker_init_fn)
@@ -184,4 +183,4 @@ for epoch in range(100000):
     train(epoch+start_epoch)
     val(epoch+start_epoch)
     #test(epoch + start_epoch)
-    if (epoch+start_epoch) % 100 == 0 and epoch+start_epoch > 0: test(epoch+start_epoch)
+    if (epoch+start_epoch) % 400 == 0 and epoch+start_epoch > 0: test(epoch+start_epoch)
