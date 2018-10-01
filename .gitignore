@@ -5,6 +5,7 @@ __pycache__/
 *.wav
 *.zip
 vsCorpus/*
+chinesesongs/*
 model/*
 # C extensions
 *.so

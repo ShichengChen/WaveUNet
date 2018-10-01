@@ -12,9 +12,8 @@ from torch.utils import data
 from torchvision import transforms
 
 from readDataset.readccmu import Dataset, Testset,Valtset
-#from unet import Unet
-from modelStruct.pyramidnet import Unet
-#from modelStruct.unet import Unet
+#from modelStruct.pyramidnet import Unet
+from modelStruct.unet import Unet
 from tensorboardX import SummaryWriter
 from transformData import mu_law_encode,mu_law_decode
 # In[2]:
@@ -29,7 +28,7 @@ savemusic='vsCorpus/pyramidccmu{}.wav'
 resumefile = 'model/pyramid'  # name of checkpoint
 continueTrain = False  # whether use checkpoint
 sampleCnt=0
-USEBOARD = True
+USEBOARD = False
 quan=False
 if(USEBOARD):writer = SummaryWriter()
 
@@ -51,10 +50,12 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 #training_set = Dataset(np.arange(45), 'ccmixter3/',pad=pad,transform=transform)
 #validation_set = Testset(np.arange(45,50), 'ccmixter3/',pad=pad)
-training_set = Dataset(np.arange(150), 'ccmixter2/')
-test_set = Testset(np.arange(140,160), 'ccmixter2/')
-validation_set =Valtset(np.arange(150,200), 'ccmixter2/')
-
+#training_set = Dataset(np.arange(150), 'ccmixter2/')
+#test_set = Testset(np.arange(140,160), 'ccmixter2/')
+#validation_set =Valtset(np.arange(150,200), 'ccmixter2/')
+training_set = Dataset(np.arange(1), 'ccmixter2/')
+test_set = Dataset(np.arange(1), 'ccmixter2/')
+validation_set =Valtset(np.arange(1), 'ccmixter2/')
 
 worker_init_fn = lambda worker_id: np.random.seed(np.random.get_state()[1][0] + worker_id)
 loadtr = data.DataLoader(training_set, batch_size=75,shuffle=True,num_workers=10,worker_init_fn=worker_init_fn)

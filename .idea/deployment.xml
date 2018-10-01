@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="liuyue">
+  <component name="PublishConfigData" autoUpload="Always" serverName="ubuntu@13.236.6.128:22">
     <serverData>
+      <paths name="aws">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="liuyue">
         <serverdata>
           <mappings>
@@ -9,6 +16,21 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="ubuntu@13.210.158.159:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_14" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="ubuntu@13.236.6.128:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_96" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
     </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>
