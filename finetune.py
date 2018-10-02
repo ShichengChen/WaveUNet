@@ -18,27 +18,25 @@ from tensorboardX import SummaryWriter
 from transformData import mu_law_encode,mu_law_decode
 # In[2]:
 
-batchSize = 2
+batchSize = 1
 sampleSize = 16384*batchSize  # the length of the sample size
 sample_rate = 16384
 songnum=45
-savemusic='vsCorpus/nus1xtr{}.wav'
-#savemusic0='vsCorpus/nus10xtr{}.wav'
-#savemusic1='vsCorpus/nus11xtr{}.wav'
-resumefile = 'model/instrument1song'  # name of checkpoint
-continueTrain = False  # whether use checkpoint
+savemusic=['vsCorpus/nus0xtr{}.wav','vsCorpus/nus1xtr{}.wav']
+resumefile = 'model/saveForTransfer22'  # name of checkpoint
+continueTrain = True  # whether use checkpoint
 sampleCnt=0
 USEBOARD = False
 quan=False
 if(USEBOARD):writer = SummaryWriter()
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # use specific GPU
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # use specific GPU
 
 # In[4]:
 from datetime import datetime
 current_time = datetime.now().strftime('%b%d_%H-%M-%S')
-if(USEBOARD):writer = SummaryWriter(log_dir='../conditioned-wavenet/runs/'+str(current_time)+'mulaw,chinesewav,15filtersize',comment="uwavenet")
+if(USEBOARD):writer = SummaryWriter(log_dir='runs/'+str(current_time)+'mulaw,chinesewav,15filtersize',comment="uwavenet")
 
 
 use_cuda = torch.cuda.is_available()  # whether have available GPU
@@ -53,9 +51,9 @@ device = torch.device("cuda" if use_cuda else "cpu")
 #training_set = Dataset(np.arange(45), 'chinesesongs/')
 #test_set = Testset(np.arange(0,50), 'chinesesongs/')
 #validation_set =Valtset(np.arange(45,50), 'chinesesongs/')
-training_set = Dataset(np.arange(1), 'chinesesongs/')
-test_set = Testset(np.arange(1), 'chinesesongs/')
-validation_set =Valtset(np.arange(1), 'chinesesongs/')
+training_set = Dataset(np.arange(45), 'chinesesongs/')
+test_set = Testset(np.arange(50), 'chinesesongs/')
+validation_set =Valtset(np.arange(45,50), 'chinesesongs/')
 
 
 worker_init_fn = lambda worker_id: np.random.seed(np.random.get_state()[1][0] + worker_id)
@@ -114,7 +112,7 @@ def test(epoch):  # testing data
             print('loss for test:{},num{},epoch{}'.format(aveloss, iloader,epoch))
             ans0 = mu_law_decode(np.concatenate(listofpred0))
             if not os.path.exists('vsCorpus/'): os.makedirs('vsCorpus/')
-            sf.write(savemusic.format(iloader), ans0, sample_rate)
+            sf.write(savemusic[epoch].format(iloader), ans0, sample_rate)
             print('test stored done', np.round(time.time() - start_time))
 
 def val(epoch):
@@ -123,7 +121,7 @@ def val(epoch):
     cnt, aveloss = 0, 0
     with torch.no_grad():
         for iloader, xtrain, ytrain in loadval:
-            for ind in range(0, xtrain.shape[-1], sampleSize // batchSize):
+            for ind in range(0, xtrain.shape[-1], sampleSize):
                 if (xtrain[0, 0, ind:ind + sampleSize].shape[0] < (sampleSize)): break
                 output = model(xtrain[:, :, ind:ind + sampleSize].to(device))
                 loss = criterion(output, (ytrain[:, :, ind:ind + sampleSize].to(device)))
@@ -136,7 +134,7 @@ def val(epoch):
 def train(epoch):  # training data, the audio except for last 15 seconds
     for iloader,xtrain, ytrain in loadtr:
         startx = 0
-        idx = np.arange(startx, xtrain.shape[-1], 2000)
+        idx = np.arange(startx, xtrain.shape[-1], sampleSize)
         #np.random.shuffle(idx)
         cnt, aveloss = 0, 0
         start_time = time.time()
@@ -167,21 +165,10 @@ def train(epoch):  # training data, the audio except for last 15 seconds
 
         if (USEBOARD): writer.add_scalar('waveunet loss', (aveloss / cnt), iteration)
 
-    if epoch % 5 == 0:
-        if not os.path.exists('model/'): os.makedirs('model/')
-        state = {'epoch': epoch,
-                 'state_dict': model.state_dict(),
-                 'optimizer': optimizer.state_dict(),
-                 'iteration': iteration}
-        torch.save(state, resumefile)
-        print('write finish')
-
-
-# In[ ]:
 
 print('training...')
-for epoch in range(100000):
-    train(epoch+start_epoch)
-    val(epoch+start_epoch)
-    #test(epoch + start_epoch)
-    if (epoch+start_epoch) % 100 == 0 and epoch+start_epoch > 0: test(epoch+start_epoch)
+test(0)
+val(0)
+train(0)
+val(0)
+test(1)

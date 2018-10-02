@@ -2,16 +2,8 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="3fdeac58-1fe7-4e79-988b-ed9ca6223dd9" name="liuyue" url="http://172.21.150.236">
-        <fileTransfer host="172.21.150.236" port="22" rootFolder="/home/n1705499c" accessType="SFTP">
-          <advancedOptions>
-            <advancedOptions dataProtectionLevel="Private" />
-          </advancedOptions>
-          <option name="port" value="22" />
-        </fileTransfer>
-      </webServer>
-      <webServer id="f6873a83-5045-417a-b2bb-f529e9883947" name="aws" url="http://13.210.158.159">
-        <fileTransfer host="13.210.158.159" port="22" privateKey="$USER_HOME$/munewndell.pem" rootFolder="/home/ubuntu" accessType="SFTP" keyPair="true">
+      <webServer id="d9c4ab19-db4b-472a-a425-2aaef32a8240" name="nus" url="http://ncrs.d2.comp.nus.edu.sg">
+        <fileTransfer host="ncrs.d2.comp.nus.edu.sg" port="22" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" shareSSLContext="true" />
           </advancedOptions>
