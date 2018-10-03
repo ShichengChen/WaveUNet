@@ -8,8 +8,8 @@ import torch.nn.functional as F
 import soundfile as sf
 from transformData import mu_law_encode,quan_mu_law_encode
 
-sampleSize = 16384 * 60
-sample_rate = 16384 * 60
+sampleSize = 16384 * 120
+sample_rate = 16384 * 120
 
 
 class Dataset(data.Dataset):

@@ -14,31 +14,30 @@ from torchvision import transforms
 
 from readccmu import Dataset, Testset,Valtset
 #from modelStruct.pyramidnet import Unet
-from modelStruct.unet import Unet
+#from modelStruct.unet import Unet
+from modelStruct.resunetv2 import Resv2Unetv2
 from tensorboardX import SummaryWriter
 from transformData import mu_law_encode,mu_law_decode
 # In[2]:
 
-batchSize = 4
+batchSize = 2
 sampleSize = 16384*batchSize  # the length of the sample size
 sample_rate = 16384
-savemusic='vsCorpus/unet{}.wav'
-#savemusic0='vsCorpus/nus10xtr{}.wav'
-#savemusic1='vsCorpus/nus11xtr{}.wav'
-resumefile = 'model/saveForPyramid'  # name of checkpoint
+savemusic='vsCorpus/resv2{}.wav'
+resumefile = 'model/saveresv2unetv2'  # name of checkpoint
 continueTrain = False  # whether use checkpoint
 saveFile = True
 sampleCnt=0
 USEBOARD = True
 quan=False
-
+print('UUUsing board!!!!!!!!!!!or not',USEBOARD)
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "2"  # use specific GPU
 
 # In[4]:
 from datetime import datetime
 current_time = datetime.now().strftime('%b%d_%H-%M-%S')
-if(USEBOARD):writer = SummaryWriter(log_dir='runs/'+str(current_time)+'cc+mu,pyramid,30songs,4seconds')
+if(USEBOARD):writer = SummaryWriter(log_dir='runs/'+str(current_time)+'cc+mu,resunetv2,30songs,4seconds')
 
 
 use_cuda = torch.cuda.is_available()  # whether have available GPU
@@ -50,19 +49,19 @@ device = torch.device("cuda" if use_cuda else "cpu")
 
 #training_set = Dataset(np.arange(45), 'ccmixter3/',pad=pad,transform=transform)
 #validation_set = Testset(np.arange(45,50), 'ccmixter3/',pad=pad)
-training_set = Dataset(np.arange(150), 'ccmixter2/')
+training_set = Dataset(np.arange(0,150), 'ccmixter2/')
 test_set = Testset(np.arange(140,200), 'ccmixter2/')
 validation_set =Valtset(np.arange(150,200), 'ccmixter2/')
 
 
 worker_init_fn = lambda worker_id: np.random.seed(np.random.get_state()[1][0] + worker_id)
-loadtr = data.DataLoader(training_set, batch_size=30,shuffle=True,num_workers=50,worker_init_fn=worker_init_fn)
+loadtr = data.DataLoader(training_set, batch_size=30,shuffle=True,num_workers=30,worker_init_fn=worker_init_fn)
 loadtest = data.DataLoader(test_set,batch_size=1,num_workers=6)
-loadval = data.DataLoader(validation_set,batch_size=25,num_workers=50,worker_init_fn=worker_init_fn)
+loadval = data.DataLoader(validation_set,batch_size=25,num_workers=30,worker_init_fn=worker_init_fn)
 # In[6]:
 print(torch.get_num_threads(),'get number of threads')
 #model = Unet(skipDim, quantization_channels, residualDim,device)
-model = Unet()
+model = Resv2Unetv2()
 #model = nn.DataParallel(model)
 model = model.cuda()
 criterion = nn.MSELoss()
@@ -202,4 +201,4 @@ for epoch in range(100000):
     val(epoch+start_epoch)
     #if (continueTrain and saveFile == False and epoch == 0):test(epoch + start_epoch)
     #if (continueTrain and epoch == 0): test(epoch + start_epoch)
-    if (epoch+start_epoch) % 100 == 0 and (epoch+start_epoch) > 0: test(epoch+start_epoch)
+    if (epoch+start_epoch) % 20 == 0 and (epoch+start_epoch) > 0: test(epoch+start_epoch)
