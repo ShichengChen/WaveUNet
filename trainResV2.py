@@ -24,7 +24,7 @@ batchSize = 2
 sampleSize = 16384*batchSize  # the length of the sample size
 sample_rate = 16384
 savemusic='vsCorpus/resv2{}.wav'
-resumefile = 'model/conv4SEResUnet'  # name of checkpoint
+resumefile = 'model/SERes14Unet'  # name of checkpoint
 continueTrain = False  # whether use checkpoint
 saveFile = True
 sampleCnt=0
@@ -37,7 +37,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "2"  # use specific GPU
 # In[4]:
 from datetime import datetime
 current_time = datetime.now().strftime('%b%d_%H-%M-%S')
-if(USEBOARD):writer = SummaryWriter(log_dir='runs/'+str(current_time)+'cc+mu,4convSEResUnet,30songs,4seconds')
+if(USEBOARD):writer = SummaryWriter(log_dir='runs/'+str(current_time)+'cc+mu,SERes14Unet,30songs,4seconds')
 
 
 use_cuda = torch.cuda.is_available()  # whether have available GPU
@@ -55,9 +55,9 @@ validation_set =Valtset(np.arange(150,200), 'ccmixter2/')
 
 
 worker_init_fn = lambda worker_id: np.random.seed(np.random.get_state()[1][0] + worker_id)
-loadtr = data.DataLoader(training_set, batch_size=20,shuffle=True,num_workers=50,worker_init_fn=worker_init_fn)
+loadtr = data.DataLoader(training_set, batch_size=30,shuffle=True,num_workers=50,worker_init_fn=worker_init_fn)
 loadtest = data.DataLoader(test_set,batch_size=1,num_workers=6)
-loadval = data.DataLoader(validation_set,batch_size=20,num_workers=50,worker_init_fn=worker_init_fn)
+loadval = data.DataLoader(validation_set,batch_size=25,num_workers=50,worker_init_fn=worker_init_fn)
 # In[6]:
 print(torch.get_num_threads(),'get number of threads')
 #model = Unet(skipDim, quantization_channels, residualDim,device)

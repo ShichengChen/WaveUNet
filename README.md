@@ -4,7 +4,7 @@ implement Wave-U-Net by pytorch
 # result
 |[Wave-U-Net](https://arxiv.org/pdf/1806.03185.pdf) |my improved version|
 | ------ | ------ |
-| SDR=11.83  | SDR=12.35 |
+| SDR=11.83  | SDR=12.51 |
 
 # Train network
 - if you just want to train the model, use commandTrain.py
